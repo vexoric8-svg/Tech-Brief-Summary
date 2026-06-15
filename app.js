@@ -168,3 +168,66 @@ if ('serviceWorker' in navigator && !isLocalhost) {
     navigator.serviceWorker.register('./sw.js').catch((e) => console.warn('SW failed:', e));
   });
 }
+
+/* ---------- Push notifications ---------- */
+const VAPID_PUBLIC_KEY =
+  'BGMasodHWnEB9rWST7aEksZIOWIekTCIwAlVa0YJGXEGh5cIFt69hReAbcYkBdBX2e_D9tu-rWVERWA52UBaEuI';
+
+const notifyBtn = document.getElementById('notify');
+const sheet = document.getElementById('notif-sheet');
+const sheetMsg = document.getElementById('notif-msg');
+const sheetSub = document.getElementById('notif-sub');
+const sheetCopy = document.getElementById('notif-copy');
+const sheetClose = document.getElementById('notif-close');
+
+function openSheet(message, subscription) {
+  sheetMsg.textContent = message;
+  const hasSub = Boolean(subscription);
+  sheetSub.hidden = !hasSub;
+  sheetCopy.hidden = !hasSub;
+  if (hasSub) sheetSub.value = subscription;
+  sheetCopy.textContent = 'Copy';
+  sheet.hidden = false;
+}
+if (sheetClose) sheetClose.addEventListener('click', () => { sheet.hidden = true; });
+if (sheetCopy) sheetCopy.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(sheetSub.value); sheetCopy.textContent = 'Copied!'; }
+  catch { sheetSub.focus(); sheetSub.select(); }
+});
+
+function urlBase64ToUint8Array(b64) {
+  const pad = '='.repeat((4 - (b64.length % 4)) % 4);
+  const base64 = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
+}
+
+async function enableNotifications() {
+  if (isLocalhost) {
+    openSheet('Notifications only work on the published site. Open the live app, add it to your Home Screen, then tap the bell there.');
+    return;
+  }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+    openSheet('Your browser can’t do notifications here. On iPhone: open this app from your Home Screen icon (Share → Add to Home Screen first), then tap the bell.');
+    return;
+  }
+  let permission;
+  try { permission = await Notification.requestPermission(); }
+  catch { openSheet('Could not request notification permission.'); return; }
+  if (permission !== 'granted') {
+    openSheet('Notifications are turned off for this app. Enable them in your settings, then tap the bell again.');
+    return;
+  }
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+    });
+    openSheet('Almost done — copy the text below and paste it into your morning routine where it says SUBSCRIPTION (just once). Then you’ll get a ping each morning.', JSON.stringify(sub));
+  } catch (e) {
+    console.error('Subscribe failed:', e);
+    openSheet('Something went wrong subscribing. On iPhone, make sure you opened the app from its Home Screen icon, then try again.');
+  }
+}
+if (notifyBtn) notifyBtn.addEventListener('click', enableNotifications);
