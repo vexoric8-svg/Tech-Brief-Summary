@@ -1,0 +1,20 @@
+{
+  "updated": "2026-06-15T06:45:00Z",
+  "days": [
+    {
+      "date": "2026-06-15",
+      "headline": "AI agents go mainstream; chipmakers race on efficiency",
+      "summary": "AI agents stayed in the spotlight. Anthropic shipped Claude Opus 4.8 with a faster \"fast mode\" that keeps top-tier reasoning while cutting latency, and Apple used WWDC to preview an on-device agent framework that lets apps expose actions to a private assistant. In hardware, TSMC said its 2nm yields are running ahead of schedule, easing supply worries for next year's flagship chips.\n\n- Anthropic: Opus 4.8 trims latency without dropping to a smaller model\n- Apple: on-device agents with per-app permissions\n- TSMC: 2nm volume production beating internal targets"
+    },
+    {
+      "date": "2026-06-14",
+      "headline": "Open models close the gap; EU finalizes AI rules",
+      "summary": "A new open-weight model matched frontier benchmarks at a fraction of the cost, reigniting the build-vs-buy debate for startups. Meanwhile, the EU published its final compliance timeline for the AI Act, phasing in high-risk obligations over 18 months with a grace period for documentation."
+    },
+    {
+      "date": "2026-06-13",
+      "headline": "Browsers gain agent APIs; a quiet week for hardware",
+      "summary": "Chrome shipped an experimental, flag-gated on-page automation API aimed at accessibility and assistants, and GitHub added scheduled agents to Actions with budget caps and per-repo scoping. Hardware news was quiet heading into the weekend."
+    }
+  ]
+}

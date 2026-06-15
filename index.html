@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Morning Tech Brief</title>
+  <meta name="description" content="Your daily tech news summary." />
+
+  <!-- PWA / mobile -->
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#f1ebe0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Tech Brief" />
+  <link rel="apple-touch-icon" href="./icons/icon-180.png" />
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar__titles">
+        <h1 class="topbar__title">Morning Brief</h1>
+        <p class="topbar__sub" id="updated">Loading…</p>
+      </div>
+      <button class="refresh" id="refresh" aria-label="Refresh" title="Refresh">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="feed" id="feed">
+      <!-- Rendered by app.js -->
+      <div class="skeleton" id="skeleton">
+        <div class="sk sk--date"></div>
+        <div class="sk sk--card"></div>
+        <div class="sk sk--card"></div>
+        <div class="sk sk--card"></div>
+      </div>
+    </main>
+
+    <footer class="foot">
+      <span id="foot-note">Updated each morning</span>
+    </footer>
+  </div>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>

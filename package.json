@@ -1,0 +1,9 @@
+{
+  "name": "morning-tech-brief",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A dark, mobile-first PWA that shows a daily tech-news summary read from news.json.",
+  "scripts": {
+    "build:icons": "node scripts/gen-icons.mjs"
+  }
+}
