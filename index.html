@@ -6,7 +6,6 @@
   <title>Morning Tech Brief</title>
   <meta name="description" content="Your daily tech news summary." />
 
-  <!-- PWA / mobile -->
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#f1ebe0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -18,35 +17,101 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="app">
-    <header class="topbar">
-      <div class="topbar__titles">
-        <h1 class="topbar__title">Morning Brief</h1>
-        <p class="topbar__sub" id="updated">Loading…</p>
-      </div>
-      <button class="refresh" id="refresh" aria-label="Refresh" title="Refresh">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6" />
-        </svg>
-      </button>
-    </header>
+  <div class="pages" id="pages">
 
-    <main class="feed" id="feed">
-      <!-- Rendered by app.js -->
-      <div class="skeleton" id="skeleton">
-        <div class="sk sk--date"></div>
-        <div class="sk sk--card"></div>
-        <div class="sk sk--card"></div>
-        <div class="sk sk--card"></div>
-      </div>
-    </main>
+    <!-- Page 1: the morning brief -->
+    <section class="page" id="page-brief">
+      <div class="page__inner">
+        <header class="topbar">
+          <div class="topbar__titles">
+            <h1 class="topbar__title">Morning Brief</h1>
+            <p class="topbar__sub" id="updated">Loading…</p>
+          </div>
+          <div class="topbar__actions">
+            <button class="refresh" id="notify" aria-label="Enable notifications" title="Enable notifications">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" />
+              </svg>
+            </button>
+            <button class="refresh" id="refresh" aria-label="Refresh" title="Refresh">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6" />
+              </svg>
+            </button>
+          </div>
+        </header>
 
-    <footer class="foot">
-      <span id="foot-note">Updated each morning</span>
-    </footer>
+        <main class="feed" id="feed">
+          <div class="skeleton" id="skeleton">
+            <div class="sk sk--date"></div>
+            <div class="sk sk--card"></div>
+            <div class="sk sk--card"></div>
+            <div class="sk sk--card"></div>
+          </div>
+        </main>
+
+        <footer class="foot"><span id="foot-note">Updated each morning</span></footer>
+      </div>
+    </section>
+
+    <!-- Page 2: markets -->
+    <section class="page" id="page-stocks">
+      <div class="page__inner">
+        <header class="topbar">
+          <div class="topbar__titles">
+            <h1 class="topbar__title">Markets</h1>
+            <p class="topbar__sub" id="stocks-updated">Loading…</p>
+          </div>
+        </header>
+
+        <div class="stocks">
+          <select id="ticker" class="select" aria-label="Choose a company"></select>
+
+          <div class="quote">
+            <span class="quote__price" id="quote-price">—</span>
+            <span class="quote__change" id="quote-change"></span>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas id="chart" class="chart"></canvas>
+            <div class="chart-tip" id="chart-tip" hidden></div>
+            <div class="chart-empty" id="chart-empty" hidden>No data yet for this company.</div>
+          </div>
+
+          <div class="ranges" id="ranges">
+            <button class="range" data-range="21">1M</button>
+            <button class="range is-active" data-range="63">3M</button>
+            <button class="range" data-range="126">6M</button>
+            <button class="range" data-range="252">1Y</button>
+          </div>
+        </div>
+
+        <footer class="foot"><span>Daily closing prices · updates each morning</span></footer>
+      </div>
+    </section>
+
+  </div>
+
+  <nav class="dots" aria-label="Pages">
+    <button class="dot is-active" data-page="0" aria-label="Show brief"></button>
+    <button class="dot" data-page="1" aria-label="Show markets"></button>
+  </nav>
+
+  <div class="sheet" id="notif-sheet" hidden>
+    <div class="sheet__card">
+      <h2 class="sheet__title">Morning notifications</h2>
+      <p class="sheet__text" id="notif-msg"></p>
+      <textarea class="sheet__sub" id="notif-sub" readonly hidden></textarea>
+      <div class="sheet__actions">
+        <button class="sheet__btn sheet__btn--primary" id="notif-copy" hidden>Copy</button>
+        <button class="sheet__btn" id="notif-close">Close</button>
+      </div>
+    </div>
   </div>
 
   <script src="./app.js" defer></script>
+  <script src="./stocks.js" defer></script>
 </body>
 </html>
