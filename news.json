@@ -1,6 +1,11 @@
 {
-  "updated": "2026-06-16T04:56:05Z",
+  "updated": "2026-06-17T04:56:03Z",
   "days": [
+    {
+      "date": "2026-06-17",
+      "headline": "AI infrastructure buildout goes all-in; SpaceX makes history; Microsoft's busiest patch month ever",
+      "summary": "🤖 Tech giants are committing staggering capital to AI infrastructure — Alphabet announced an $80 billion stock sale explicitly for compute capacity, Meta revealed four new generations of custom AI chips launching by end of 2027, and Nvidia unveiled RTX Spark combining graphics and CPUs for AI PCs. Google's breakthrough TurboQuant algorithm dramatically reduces the memory bottleneck in large language models, making massive context windows practical. The message is clear: AI has moved from R&D to core infrastructure, and whoever controls the chips and compute wins.\n\n🚀 SpaceX priced history's largest IPO at a staggering $1.77 trillion valuation, marking the space industry's breakthrough moment into mainstream capital markets. The offering signals that investors now see space technology not as a speculative bet but as essential infrastructure for the digital age. This could unlock decades of capital for satellite internet, lunar missions, and Mars exploration.\n\n🔒 June 2026 became the most security-intense month in tech history — Microsoft shipped 200 vulnerabilities in a single Patch Tuesday, including 33 critical flaws and six zero-days (five already publicly disclosed before fixes existed). ServiceNow disclosed a third major authentication vulnerability in eight months, and attackers compromised Red Hat npm packages in a sophisticated supply chain attack that deployed credential-stealing malware. The message: zero-day exploits are now table stakes, and supply chain attacks target open-source foundations.\n\n👀 Watch for: whether enterprise AI agentic deployments announced at Nvidia's GTC 2026 survive their first 90 days in production, and how the wave of zero-days reshapes patch management practices across Fortune 500."
+    },
     {
       "date": "2026-06-16",
       "headline": "AI security under scrutiny; SpaceX sets record $1.77T IPO while major breaches emerge",
