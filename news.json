@@ -1,6 +1,11 @@
 {
-  "updated": "2026-06-20T04:56:50Z",
+  "updated": "2026-06-21T04:55:54Z",
   "days": [
+    {
+      "date": "2026-06-21",
+      "headline": "DeepSeek's frontier models reshape the AI landscape; SpaceX IPO marks space as critical infrastructure; critical security vulnerabilities demand immediate patching.",
+      "summary": "🤖 DeepSeek released V4-Pro and V4-Flash models with a groundbreaking 1-million token context window and Mixture-of-Experts architecture designed to slash inference costs and excel at agentic AI tasks. These models represent a major leap in enabling long-running autonomous agents while reducing computational overhead—a crucial advancement as AI systems become more complex and compute-hungry.\n\n🚀 SpaceX closed its IPO at $161 per share on June 12, jumping 19% after its record debut. CEO Gwynne Shotwell signaled SpaceX's pivot toward infrastructure dominance, noting the company is building data centers both on the ground and in orbit to compete in the emerging AI neocloud space—positioning launches not just as cargo delivery but as fundamental infrastructure for AI deployment.\n\n🔓 A critical Windows Netlogon vulnerability (CVE-2026-41089, CVSS 9.8) is being actively exploited for remote code execution. Microsoft patched this in May alongside 136 other bugs, but threat actors are now weaponizing it at scale. Organizations must prioritize patching immediately, as the vulnerability allows unauthenticated RCE on exposed systems.\n\n🔐 French government messaging app Tchap was breached, with attackers stealing 13.5 GB of data including 73,467 user accounts from French Ministries, 643,459 messages, 876 chat rooms, and shared media files. The incident highlights ongoing risks to critical government infrastructure and the importance of zero-trust security for sensitive communications.\n\n👀 Watch for more consolidation in AI hardware (Qualcomm's potential Tenstorrent acquisition talks are ongoing) and continued quarterly results season revealing which enterprises are scaling AI workloads most aggressively."
+    },
     {
       "date": "2026-06-20",
       "headline": "SpaceX soars at IPO while AI wars heat up; cybersecurity reaches crisis point",
