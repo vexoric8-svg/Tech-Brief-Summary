@@ -1,143 +1,256 @@
-/* Markets page — reads stocks.json and draws an interactive line chart.
-   Vanilla canvas, no dependencies. */
+/* Markets page — candlestick chart with crosshair, OHLC legend, pan + zoom.
+   Vanilla canvas, no dependencies. Reads stocks.json (OHLC + volume). */
 (() => {
   const DATA_URL = './stocks.json';
   const UP = '#2f8f5b';
   const DOWN = '#c5482f';
 
-  const sel = document.getElementById('ticker');
-  const priceEl = document.getElementById('quote-price');
-  const changeEl = document.getElementById('quote-change');
-  const updatedEl = document.getElementById('stocks-updated');
-  const canvas = document.getElementById('chart');
-  const tip = document.getElementById('chart-tip');
-  const emptyEl = document.getElementById('chart-empty');
-  const rangesEl = document.getElementById('ranges');
+  const $ = (id) => document.getElementById(id);
+  const sel = $('ticker');
+  const priceEl = $('quote-price');
+  const changeEl = $('quote-change');
+  const updatedEl = $('stocks-updated');
+  const canvas = $('chart');
+  const legendEl = $('chart-legend');
+  const emptyEl = $('chart-empty');
+  const rangesEl = $('ranges');
+  const typesEl = $('chart-types');
   if (!sel || !canvas) return;
   const ctx = canvas.getContext('2d');
 
   let stocks = [];
-  let current = null;
-  let rangeDays = 63;
-  let view = [];
-  let geom = null;
+  let cur = null;
+  let full = [];
+  let count = 63;          // visible candles
+  let start = 0;           // index of first visible candle
+  let type = 'candles';    // 'candles' | 'line'
+  let hover = -1;          // hovered visible index
+  let geo = null;          // layout snapshot for pointer math
+  const pointers = new Map();
+  let pinch = null;
+  let panLast = null;
 
-  const lineVar = () => getComputedStyle(document.documentElement).getPropertyValue('--line').trim() || '#ddd';
-  const fmtPrice = (v) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const fmtDate = (iso) => {
-    const [y, m, d] = iso.split('-').map(Number);
-    return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-  };
+  const L = { padTop: 10, axR: 56, axB: 20, volH: 40, gap: 8, padL: 2 };
 
-  function computeView() {
-    const series = (current && current.series) || [];
-    view = series.slice(Math.max(0, series.length - rangeDays));
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const fmt = (v, d = 2) => v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const fmtVol = (v) => v >= 1e9 ? (v / 1e9).toFixed(2) + 'B' : v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : v >= 1e3 ? (v / 1e3).toFixed(0) + 'K' : String(v);
+  const fmtDate = (iso, yr = true) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(undefined, yr ? { month: 'short', day: 'numeric', year: 'numeric' } : { month: 'short', day: 'numeric' }); };
+
+  function clampWindow() {
+    count = Math.max(5, Math.min(Math.round(count), Math.max(5, full.length)));
+    if (count > full.length) count = full.length;
+    start = Math.max(0, Math.min(Math.round(start), full.length - count));
+  }
+  const visible = () => full.slice(start, start + count);
+
+  function niceTicks(min, max, n) {
+    const span = (max - min) || 1;
+    const mag = Math.pow(10, Math.floor(Math.log10(span / n)));
+    const norm = (span / n) / mag;
+    const step = (norm >= 5 ? 5 : norm >= 2 ? 2 : 1) * mag;
+    const ticks = [];
+    for (let v = Math.ceil(min / step) * step; v <= max; v += step) ticks.push(v);
+    return ticks;
   }
 
   function draw() {
     const dpr = window.devicePixelRatio || 1;
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
+    const W = canvas.clientWidth, H = canvas.clientHeight;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-    if (view.length < 2) { geom = null; return; }
+    ctx.clearRect(0, 0, W, H);
+    const vis = visible();
+    if (vis.length < 1) { geo = null; return; }
 
-    const padX = 2, padTop = 10, padBot = 10;
-    const closes = view.map((p) => p.c);
-    let min = Math.min(...closes), max = Math.max(...closes);
-    if (min === max) { min -= 1; max += 1; }
-    const x = (i) => padX + (i / (view.length - 1)) * (w - padX * 2);
-    const y = (c) => padTop + (1 - (c - min) / (max - min)) * (h - padTop - padBot);
-    geom = { x, y };
+    const plotL = L.padL, plotR = W - L.axR, plotW = plotR - plotL;
+    const priceTop = L.padTop, priceBot = H - L.axB - L.volH - L.gap, priceH = priceBot - priceTop;
+    const volBot = H - L.axB;
+    const slot = plotW / vis.length;
+    let lo = Infinity, hi = -Infinity, vmax = 0;
+    for (const k of vis) { lo = Math.min(lo, k.l); hi = Math.max(hi, k.h); vmax = Math.max(vmax, k.v || 0); }
+    const pad = (hi - lo) * 0.06 || 1; lo -= pad; hi += pad;
+    const X = (i) => plotL + (i + 0.5) * slot;
+    const Y = (p) => priceTop + (1 - (p - lo) / (hi - lo)) * priceH;
+    geo = { plotL, plotR, slot, n: vis.length };
 
-    const up = view[view.length - 1].c >= view[0].c;
-    const color = up ? UP : DOWN;
+    const line = css('--line') || '#e4dbca';
+    const muted = css('--muted') || '#807769';
+    ctx.font = '11px -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textBaseline = 'middle';
+    for (const t of niceTicks(lo, hi, 4)) {
+      const y = Y(t);
+      ctx.globalAlpha = 0.55; ctx.strokeStyle = line; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(plotL, y); ctx.lineTo(plotR, y); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.fillStyle = muted; ctx.textAlign = 'left';
+      ctx.fillText(fmt(t, t < 10 ? 2 : 0), plotR + 6, y);
+    }
 
-    ctx.beginPath();
-    ctx.moveTo(x(0), y(view[0].c));
-    for (let i = 1; i < view.length; i++) ctx.lineTo(x(i), y(view[i].c));
-    ctx.lineTo(x(view.length - 1), h - padBot);
-    ctx.lineTo(x(0), h - padBot);
-    ctx.closePath();
-    const grad = ctx.createLinearGradient(0, padTop, 0, h);
-    grad.addColorStop(0, color + '22');
-    grad.addColorStop(1, color + '00');
-    ctx.fillStyle = grad;
-    ctx.fill();
+    if (vmax > 0) {
+      ctx.globalAlpha = 0.45;
+      for (let i = 0; i < vis.length; i++) {
+        const k = vis[i], bh = (k.v / vmax) * L.volH, bw = Math.max(1, slot * 0.6);
+        ctx.fillStyle = k.c >= k.o ? UP : DOWN;
+        ctx.fillRect(X(i) - bw / 2, volBot - bh, bw, bh);
+      }
+      ctx.globalAlpha = 1;
+    }
 
-    ctx.beginPath();
-    ctx.moveTo(x(0), y(view[0].c));
-    for (let i = 1; i < view.length; i++) ctx.lineTo(x(i), y(view[i].c));
-    ctx.lineWidth = 2;
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = color;
-    ctx.stroke();
+    if (type === 'line') {
+      ctx.beginPath();
+      vis.forEach((k, i) => { const x = X(i), y = Y(k.c); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+      ctx.strokeStyle = vis[vis.length - 1].c >= vis[0].c ? UP : DOWN;
+      ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+    } else {
+      const bw = Math.max(1, slot * 0.62);
+      for (let i = 0; i < vis.length; i++) {
+        const k = vis[i], up = k.c >= k.o, col = up ? UP : DOWN, x = X(i);
+        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x, Y(k.h)); ctx.lineTo(x, Y(k.l)); ctx.stroke();
+        const yO = Y(k.o), yC = Y(k.c);
+        ctx.fillRect(x - bw / 2, Math.min(yO, yC), bw, Math.max(1, Math.abs(yC - yO)));
+      }
+    }
+
+    ctx.fillStyle = muted; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    const nlab = Math.min(4, vis.length);
+    for (let j = 0; j < nlab; j++) {
+      const i = nlab === 1 ? 0 : Math.round(j * (vis.length - 1) / (nlab - 1));
+      ctx.fillText(fmtDate(vis[i].d, false), X(i), H - 6);
+    }
+
+    if (hover >= 0 && hover < vis.length) {
+      const k = vis[hover], x = X(hover), yc = Y(k.c);
+      ctx.save();
+      ctx.strokeStyle = muted; ctx.globalAlpha = 0.6; ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(x, priceTop); ctx.lineTo(x, volBot); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(plotL, yc); ctx.lineTo(plotR, yc); ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = css('--text') || '#2b2620';
+      ctx.fillRect(plotR, yc - 9, L.axR, 18);
+      ctx.fillStyle = css('--bg') || '#f1ebe0'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(fmt(k.c), plotR + 6, yc);
+    }
+
+    updateLegend(hover >= 0 && hover < vis.length ? vis[hover] : vis[vis.length - 1]);
+  }
+
+  function updateLegend(k) {
+    if (!k || !legendEl || !cur) return;
+    const up = k.c >= k.o, chg = k.o ? (k.c - k.o) / k.o * 100 : 0;
+    const span = (t, cls) => { const s = document.createElement('span'); if (cls) s.className = cls; s.textContent = t; return s; };
+    const r1 = document.createElement('div'); r1.className = 'legend__row';
+    r1.append(span(cur.ticker, 'legend__tk'), span(fmtDate(k.d), 'legend__dt'));
+    const r2 = document.createElement('div'); r2.className = 'legend__row legend__ohlc';
+    r2.append(span('O ' + fmt(k.o)), span('H ' + fmt(k.h)), span('L ' + fmt(k.l)), span('C ' + fmt(k.c)),
+      span((up ? '+' : '') + chg.toFixed(2) + '%', up ? 'up' : 'down'), span('Vol ' + fmtVol(k.v || 0)));
+    legendEl.replaceChildren(r1, r2);
   }
 
   function updateQuote() {
-    if (view.length === 0) { priceEl.textContent = '—'; changeEl.textContent = ''; changeEl.className = 'quote__change'; return; }
-    const last = view[view.length - 1].c;
-    const first = view[0].c;
-    const diff = last - first;
-    const pct = first ? (diff / first) * 100 : 0;
-    const up = diff >= 0;
-    priceEl.textContent = fmtPrice(last);
-    changeEl.textContent = `${up ? '▲' : '▼'} ${fmtPrice(Math.abs(diff))} (${up ? '+' : ''}${pct.toFixed(2)}%)`;
+    if (!full.length) { priceEl.textContent = '—'; changeEl.textContent = ''; changeEl.className = 'quote__change'; return; }
+    const last = full[full.length - 1], prev = full.length > 1 ? full[full.length - 2] : last;
+    const diff = last.c - prev.c, pct = prev.c ? diff / prev.c * 100 : 0, up = diff >= 0;
+    priceEl.textContent = '$' + fmt(last.c);
+    changeEl.textContent = `${up ? '▲' : '▼'} ${fmt(Math.abs(diff))} (${up ? '+' : ''}${pct.toFixed(2)}%) today`;
     changeEl.className = 'quote__change ' + (up ? 'up' : 'down');
   }
 
   function render() {
-    computeView();
-    emptyEl.hidden = view.length >= 2;
+    full = (cur && cur.series) || [];
+    emptyEl.hidden = full.length > 0;
+    if (legendEl) legendEl.style.display = full.length > 0 ? '' : 'none';
+    clampWindow();
     updateQuote();
     draw();
   }
 
   function selectTicker(ticker) {
-    current = stocks.find((s) => s.ticker === ticker) || stocks[0] || null;
+    cur = stocks.find((s) => s.ticker === ticker) || stocks[0] || null;
+    full = (cur && cur.series) || [];
+    count = Math.min(count, Math.max(5, full.length));
+    start = Math.max(0, full.length - count);
+    hover = -1;
     render();
   }
 
   function setRange(days) {
-    rangeDays = days;
+    count = Math.min(days, Math.max(5, full.length));
+    start = Math.max(0, full.length - count);
+    hover = -1;
     [...rangesEl.children].forEach((b) => b.classList.toggle('is-active', Number(b.dataset.range) === days));
-    render();
-  }
-
-  function scrub(clientX) {
-    if (!geom || view.length < 2) return;
-    const rect = canvas.getBoundingClientRect();
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    let i = Math.round(((clientX - rect.left) - 2) / (w - 4) * (view.length - 1));
-    i = Math.max(0, Math.min(view.length - 1, i));
     draw();
-    const cx = geom.x(i), cy = geom.y(view[i].c);
-    ctx.beginPath();
-    ctx.moveTo(cx, 8); ctx.lineTo(cx, h - 8);
-    ctx.lineWidth = 1; ctx.strokeStyle = lineVar(); ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-    ctx.fillStyle = view[view.length - 1].c >= view[0].c ? UP : DOWN;
-    ctx.fill();
-    tip.hidden = false;
-    tip.textContent = `${fmtDate(view[i].d)} · ${fmtPrice(view[i].c)}`;
-    tip.style.left = Math.max(46, Math.min(w - 46, cx)) + 'px';
   }
-  function endScrub() { tip.hidden = true; draw(); }
 
-  canvas.addEventListener('pointermove', (e) => scrub(e.clientX));
-  canvas.addEventListener('pointerdown', (e) => scrub(e.clientX));
-  canvas.addEventListener('pointerleave', endScrub);
-  canvas.addEventListener('pointercancel', endScrub);
-  window.addEventListener('resize', () => { if (current) draw(); });
-  if (window.ResizeObserver) new ResizeObserver(() => { if (current) draw(); }).observe(canvas);
+  function setType(t) {
+    type = t;
+    [...typesEl.children].forEach((b) => b.classList.toggle('is-active', b.dataset.type === t));
+    draw();
+  }
+
+  /* ---- interaction ---- */
+  const localX = (clientX) => clientX - canvas.getBoundingClientRect().left;
+  function idxAt(x) {
+    if (!geo) return -1;
+    const rel = (x - geo.plotL) / (geo.plotR - geo.plotL);
+    return Math.max(0, Math.min(geo.n - 1, Math.floor(rel * geo.n)));
+  }
+  function zoomAt(x, factor) {
+    const i = idxAt(x); if (i < 0) return;
+    const anchor = start + i;
+    const frac = geo ? i / geo.n : 0.5;
+    count = Math.max(5, Math.min(Math.round(count * factor), full.length));
+    start = Math.round(anchor - frac * count);
+    clampWindow(); draw();
+  }
+  function panBy(dxPixels) {
+    if (!geo) return;
+    start = start - Math.round(dxPixels / geo.slot);
+    clampWindow(); draw();
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.size === 2) {
+      const p = [...pointers.values()];
+      pinch = { dist: Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y), mid: (p[0].x + p[1].x) / 2, count, start };
+    } else if (e.pointerType === 'mouse') {
+      panLast = e.clientX;
+    }
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.size >= 2 && pinch) {
+      const p = [...pointers.values()];
+      const dist = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+      const mid = (p[0].x + p[1].x) / 2;
+      count = Math.max(5, Math.min(Math.round(pinch.count * (pinch.dist / Math.max(1, dist))), full.length));
+      start = Math.round(pinch.start - (mid - pinch.mid) / (geo ? geo.slot : 1));
+      clampWindow(); draw();
+      return;
+    }
+    if (e.pointerType === 'mouse' && (e.buttons & 1) && panLast != null) {
+      panBy(e.clientX - panLast); panLast = e.clientX; return;
+    }
+    hover = idxAt(localX(e.clientX)); draw();
+  });
+  function endPointer(e) {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (e.pointerType === 'mouse') panLast = null;
+    if (pointers.size === 0 && e.pointerType !== 'mouse') { hover = -1; draw(); }
+  }
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', endPointer);
+  canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !(e.buttons & 1)) { hover = -1; draw(); } });
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); zoomAt(localX(e.clientX), e.deltaY > 0 ? 1.15 : 0.87); }, { passive: false });
 
   sel.addEventListener('change', () => selectTicker(sel.value));
-  rangesEl.addEventListener('click', (e) => {
-    const b = e.target.closest('.range');
-    if (b) setRange(Number(b.dataset.range));
-  });
+  rangesEl.addEventListener('click', (e) => { const b = e.target.closest('.range'); if (b) setRange(Number(b.dataset.range)); });
+  if (typesEl) typesEl.addEventListener('click', (e) => { const b = e.target.closest('.ctype'); if (b) setType(b.dataset.type); });
+  window.addEventListener('resize', () => { if (cur) draw(); });
+  if (window.ResizeObserver) new ResizeObserver(() => { if (cur) draw(); }).observe(canvas);
 
   async function load() {
     try {
@@ -147,10 +260,7 @@
       stocks = Array.isArray(data.stocks) ? data.stocks : [];
       updatedEl.textContent = data.updated ? 'As of ' + fmtDate(data.updated.slice(0, 10)) : '';
       sel.replaceChildren(...stocks.map((s) => {
-        const o = document.createElement('option');
-        o.value = s.ticker;
-        o.textContent = `${s.name} (${s.ticker})`;
-        return o;
+        const o = document.createElement('option'); o.value = s.ticker; o.textContent = `${s.name} (${s.ticker})`; return o;
       }));
       selectTicker(stocks[0] && stocks[0].ticker);
     } catch (e) {
@@ -160,18 +270,14 @@
     }
   }
 
-  /* ---- swipe page dots ---- */
-  const pages = document.getElementById('pages');
+  const pages = $('pages');
   const dots = [...document.querySelectorAll('.dot')];
-  function syncDots() {
-    const idx = Math.round(pages.scrollLeft / pages.clientWidth);
-    dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
-  }
   if (pages) {
-    pages.addEventListener('scroll', syncDots, { passive: true });
-    dots.forEach((d, i) => d.addEventListener('click', () => {
-      pages.scrollTo({ left: i * pages.clientWidth, behavior: 'smooth' });
-    }));
+    pages.addEventListener('scroll', () => {
+      const idx = Math.round(pages.scrollLeft / pages.clientWidth);
+      dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+    }, { passive: true });
+    dots.forEach((d, i) => d.addEventListener('click', () => pages.scrollTo({ left: i * pages.clientWidth, behavior: 'smooth' })));
   }
 
   load();

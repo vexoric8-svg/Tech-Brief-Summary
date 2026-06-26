@@ -2,7 +2,7 @@
    - App shell (html/css/js/icons): cache-first.
    - news.json: network-first, falling back to the last cached copy offline. */
 
-const CACHE = 'tech-brief-v2';
+const CACHE = 'tech-brief-v3';
 const SHELL = [
   './',
   './index.html',
