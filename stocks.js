@@ -23,7 +23,7 @@
   let full = [];
   let count = 63;          // visible candles
   let start = 0;           // index of first visible candle
-  let type = 'candles';    // 'candles' | 'line'
+  let type = 'line';       // line chart (candles toggle removed)
   let hover = -1;          // hovered visible index
   let geo = null;          // layout snapshot for pointer math
   const pointers = new Map();
