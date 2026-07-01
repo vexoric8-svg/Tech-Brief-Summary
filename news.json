@@ -1,10 +1,10 @@
 {
-  "updated": "2026-07-01T15:26:21Z",
+  "updated": "2026-07-01T15:26:43Z",
   "days": [
     {
       "date": "2026-07-01",
-      "headline": "Test",
-      "summary": "Test"
+      "headline": "AI boom turns physical: trillion-param models, $84B fundraises, power limits, and the end of unlimited pricing",
+      "summary": "🤖 China open-sourced its first trillion-parameter AI model trained entirely on domestic chips, and Alphabet closed a record $84.75B fundraise (including Berkshire Hathaway's $10B bet) for AI infrastructure. The AI boom is shifting from a software play into manufacturing and capital cycles — AI hardware is now a strategic national asset that governments actively track.\n\n⚡ Data center power constraints have become the real bottleneck for AI scaling, not algorithmic innovation. Multiple reports show infrastructure is hitting physical limits while AI token consumption is expected to balloon 24x over four years as agents become common in business workflows. Companies are now managing AI costs more carefully after moving past pilot phases.\n\n💰 GitHub Copilot users reported billing shocks of 10-50x after metered pricing replaced flat-rate subscriptions, signaling the end of unlimited-usage economics across the AI industry. Model serving costs make unlimited subscriptions unsustainable, forcing a pivot to usage-based pricing.\n\n🔐 Critical security vulnerabilities are being actively exploited in the wild: CVE-2026-33017 in Langflow, CVE-2026-48558 in SimpleHelp, and CVE-2026-33825 in Microsoft Defender. New malware like RustDuck is hijacking home routers and poorly secured servers, while AI-driven evasion techniques rank as a top security concern.\n\n⚖️ Regulators are tightening control over big tech: the U.S. Supreme Court limited law enforcement's geofence warrants requiring probable cause per individual, and regulators from London to Canberra are moving against Apple and Google's grip on app ecosystems. Government oversight of AI models is intensifying alongside strategic hardware tracking.\n\n👀 Watch for GPT-5.6 government approval and Gemini 3.5 Pro's July launch as major model releases face regulatory scrutiny and capacity constraints."
     },
     {
       "date": "2026-06-15",
