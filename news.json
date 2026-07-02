@@ -1,6 +1,11 @@
 {
-  "updated": "2026-07-01T15:36:41Z",
+  "updated": "2026-07-02T05:03:43Z",
   "days": [
+    {
+      "date": "2026-07-02",
+      "headline": "AI governance tightens as agentic systems reach enterprise and SpaceX plots hardware expansion",
+      "summary": "🤖 The UN and ITU launched the AI for Good Global Commission on July 1-8, convening tech leaders and government heads to establish shared governance frameworks — signaling AI has moved from research novelty to policy necessity. Simultaneously, Apple clashed with the EU over Digital Markets Act compliance for Siri AI features, and the White House advanced talks on voluntary AI model release standards. The shift is clear: builders are now negotiating with regulators.\n\n🦾 Alteryx unveiled Agent Studio at Inspire 2026, letting business analysts convert workflows into autonomous agents without IT gatekeeping. The U.S., UK, Canada, Australia, and New Zealand jointly released \"Careful Adoption of Agentic AI Services\" guidance addressing security risks in critical infrastructure. Unisound's new U2 model (266B parameters, 10B active) hit 86.9% GPQA performance at $0.15–0.30 per 1M tokens — agentic AI is no longer experimental, it's operational infrastructure.\n\n🚀 SpaceX joins the Nasdaq-100 on July 7, unlocking ~$7B in passive inflows. More striking: Elon Musk showed investors a handset-like AI device prototype running xAI's proprietary OS, positioning SpaceX to compete in consumer AI hardware. This is SpaceX pivoting from launches to devices.\n\n🎯 Attackers discovered \"phantom squatting\" — registering fake domain names that LLMs hallucinate, then hosting phishing pages to trap users following AI-generated links. Palo Alto Networks Unit 42 warns this exploit vector will multiply as agentic AI systems route traffic autonomously. A new class of vulnerability born from AI's reasoning opacity.\n\n👀 Watch for Microsoft's next Enterprise AI wave (they reset 365 pricing July 1 to absorb AI costs) and whether the White House's voluntary AI standards proposal gains traction before the advanced talks conclude next week."
+    },
     {
       "date": "2026-07-01",
       "headline": "AI regulation meets market consolidation: Fable 5 pulled by US, open-weight models crush premium pricing",
