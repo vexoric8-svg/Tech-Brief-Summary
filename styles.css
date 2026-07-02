@@ -306,14 +306,23 @@ body {
 .chart { width: 100%; height: 100%; display: block; touch-action: none; }
 .chart-legend {
   margin: 4px 2px 2px;
-  min-height: 34px;
+  height: 36px;            /* fixed so the chart never shifts as scrubbed values change */
+  overflow: hidden;
   font-size: 12px;
   line-height: 1.45;
 }
 .legend__row { display: flex; flex-wrap: wrap; gap: 4px 10px; }
 .legend__tk { font-weight: 600; color: var(--text); }
 .legend__dt { color: var(--muted); }
-.legend__ohlc { color: var(--muted); margin-top: 1px; }
+.legend__ohlc {
+  color: var(--muted);
+  margin-top: 1px;
+  flex-wrap: nowrap;       /* keep O/H/L/C on one line — don't wrap tall on big numbers */
+  overflow-x: auto;
+  scrollbar-width: none;   /* Firefox: hide the scrollbar */
+}
+.legend__ohlc::-webkit-scrollbar { display: none; }  /* WebKit: hide the scrollbar */
+.legend__ohlc > span { flex: 0 0 auto; white-space: nowrap; }
 .legend__ohlc .up { color: #2f8f5b; font-weight: 500; }
 .legend__ohlc .down { color: #c5482f; font-weight: 500; }
 .chart-empty {
