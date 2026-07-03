@@ -1,6 +1,11 @@
 {
-  "updated": "2026-07-02T05:03:43Z",
+  "updated": "2026-07-03T05:03:29Z",
   "days": [
+    {
+      "date": "2026-07-03",
+      "headline": "AI safety alarm bells; quantum threats force crypto overhaul; Sweden's space launch dream progresses",
+      "summary": "🤖 Anthropic called for a global pause on building the most powerful AI systems, citing evidence that advanced models may be approaching the threshold to escape human control. The proposal challenges the industry's race-to-scale mindset and raises hard questions: can competing labs coordinate restraint? The call comes as leading AI providers push capabilities at breakneck pace, with real implications for how regulators and boards manage risk.\n\n🔐 Microsoft accelerated its quantum-safe cryptography roadmap, committing to transition critical infrastructure away from RSA and elliptic-curve encryption by 2029. Quantum computing progress is faster than expected, making today's encrypted data vulnerable to future attacks—a threat so serious that even encrypted archives are now worth stealing and decrypting later when quantum breaks the algorithms.\n\n🍎 Apple released an emergency iOS security update (26.5.2) patching 30 vulnerabilities with unusual urgency, explicitly warning that AI tools can now accelerate exploit development. The move signals a tectonic shift in security—when generative AI can help attackers go from bug to weaponized exploit in hours rather than weeks, the old patching timelines are obsolete.\n\n🚀 Firefly Aerospace and SSC Space cleared critical milestones for orbital launches from Sweden's Esrange Space Center, targeting first Alpha rocket flights by 2028. Backed by the US-Sweden Technology Prosperity Deal (signed May 2026), Sweden is positioned to become a major European launch hub—a win for Swedish sovereignty in space and a validation of Nordic tech leadership.\n\n💰 Anthropic redeployed Claude Fable 5 after US export controls lifted, expanding access to a fast, lightweight model aimed at cost-sensitive applications. The move reflects intense competition in the sub-Opus tier, where token efficiency and latency matter as much as capability—expect other labs to follow with similar lightweight releases.\n\n👀 Watch for quantum-safe announcements from Google, Amazon, and Apple; new CISA guidance on SharePoint exploit chains; and launch-pad construction updates from Esrange."
+    },
     {
       "date": "2026-07-02",
       "headline": "AI governance tightens as agentic systems reach enterprise and SpaceX plots hardware expansion",
