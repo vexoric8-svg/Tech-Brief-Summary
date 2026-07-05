@@ -1,6 +1,11 @@
 {
-  "updated": "2026-07-04T05:03:44Z",
+  "updated": "2026-07-05T05:03:28Z",
   "days": [
+    {
+      "date": "2026-07-05",
+      "headline": "AI infrastructure race intensifies; government enters compute competition; cybersecurity threats escalate",
+      "summary": "🤖 Anthropic released Claude Sonnet 5, the most agentic Sonnet model yet, with introductory API pricing at $2/million input tokens and $10/million output tokens through August 31. Claude Opus 4.7 demonstrated a twenty-fold improvement in robotics programming, showing substantially advanced reasoning for complex control algorithms. This marks a critical shift toward cheaper, more capable frontier models accessible to enterprises at scale.\n\n💰 The AI infrastructure arms race reached a new intensity as multiple players competed for compute dominance. OpenAI is floating an equity stake to the US government, Meta is preparing to rent out its own AI compute capacity, and Microsoft created Frontier Company with $2.5B investment and 6,000 engineers. Britain's National Grid invested $1.75B for a 35% stake in Joulent, funding a 2.67-gigawatt AI data center in West Texas—marking the first major intersection of national energy policy with frontier AI deployment.\n\n🛡️ Cybersecurity threats escalated significantly with researchers discovering PamStealer, a new macOS information stealer with sophisticated evasion techniques, and Avalon, a modular malware framework combining credential theft, lateral movement, and ransomware capabilities. The Department of Homeland Security is investigating a cyberattack on HSIN, a sensitive federal information-sharing platform, highlighting growing vulnerabilities in government infrastructure tied to third-party compromise vectors.\n\n🛰️ China's Tianwen-2 mission is preparing to rendezvous with near-Earth asteroid 469219 Kamoʻoalewa in July 2026, equipped with spectrometers, cameras, and dust analyzers to collect unprecedented asteroid composition data. This follows Japan's Hayabusa2 asteroid flyby scheduled for the same month, signaling an intensified international push toward near-Earth object exploration and resource assessment.\n\n👀 Watch for the outcome of Anthropic's preliminary discussions with Samsung on custom AI accelerator manufacturing—a potential 2nm breakthrough that could shift chip supply dynamics in the AI arms race."
+    },
     {
       "date": "2026-07-04",
       "headline": "AI infrastructure race heats up: Microsoft builds frontier unit, Anthropic chases custom chips, and cybersecurity shifts to zero-day crisis mode",
