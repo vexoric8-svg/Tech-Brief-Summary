@@ -1,6 +1,11 @@
 {
-  "updated": "2026-07-07T05:03:51Z",
+  "updated": "2026-07-10T05:03:59Z",
   "days": [
+    {
+      "date": "2026-07-10",
+      "headline": "AI infrastructure boom drives funding surge; Microsoft restructures Xbox division",
+      "summary": "🤖 Anthropic secured a landmark $19 billion long-term data center agreement as AI model training and inference demands surge. The deal highlights growing recognition that AI infrastructure—not just models—is the critical bottleneck. Similar momentum is evident as major cloud and chip players race to build compute capacity, with power consumption and cooling emerging as the next frontier challenges.\n\n🚀 SpaceX launched the world's first commercially built nuclear-powered satellite, a milestone in commercial space that opens new possibilities for long-duration missions beyond solar-powered limits. The company also logged its 36th Falcon 9 launch this year and is seeking approval for a 100,000-satellite Starlink megaconstellation, signaling aggressive expansion of global broadband coverage.\n\n💼 Microsoft announced a historic restructuring of its Xbox division, cutting approximately 3,200 positions (20% of the gaming workforce) as the company consolidates and refocuses efforts. The move reflects broader turbulence in the gaming industry and signals Microsoft's pivot toward AI integration and cloud gaming infrastructure.\n\n💰 Blue Origin raised $10 billion in its first external funding round at a $130 billion pre-money valuation, with venture leader Coatue leading the charge. Bezos' space company is accelerating its New Glenn launcher and satellite constellation ambitions, fueling a commercial space boom that now rivals venture markets in funding velocity.\n\n⚖️ Apple lost its legal challenge against the European Union's Digital Markets Act after the EU General Court upheld iOS and the App Store as \"gatekeeper services.\" The ruling reinforces Europe's aggressive stance on tech regulation and signals Apple faces mandatory changes to app store policies and sideloading requirements across the continent.\n\n👀 Watch for: Regulatory pressure on AI data center expansion (power grids, environmental impact); further tech sector restructuring as companies rebalance portfolios toward AI; and results from the next wave of space launches as commercial competition heats up."
+    },
     {
       "date": "2026-07-07",
       "headline": "AI reaches autonomous attack milestone; critical SharePoint RCE under exploitation; Meta restructures 15K staff toward AI",
